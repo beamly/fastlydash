@@ -26,8 +26,8 @@ Install all required dependancies in to a virtualenv:
 
     pip install -r requirements.txt
     
-And run providing an API key, and optionally the name of an S3 bucket:
+Run providing a Fastly API key, and optionally the name of an S3 bucket:
 
-    python fastlydash.py <API_KEY> --s3bucket beamly-dashboards
+    python fastlydash.py <FASTLY_API_KEY> --s3bucket beamly-dashboards
 
 Note that the resulting stored HTML file will be publically readable
