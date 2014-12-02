@@ -15,6 +15,9 @@ Features:
 
 And optionally writes a pretty HTML page to S3.
 
+![alt text](docs/screenshot.png)
+
+
 Usage
 =====
 
