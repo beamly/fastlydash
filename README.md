@@ -9,7 +9,9 @@ A simple python script that produces a summary of all Fastly services over the p
 - Number of requests
 - Percent of 20X, 30X, 40X, and 50X responses
 
-Features:
+Features
+--------
+
 - Filter by service name
 - Clickable column headers to sort on an field
 
@@ -24,6 +26,8 @@ Install all required dependancies in to a virtualenv:
 
     pip install -r requirements.txt
     
-And run, optionally providing the name of an S3 bucket:
+Run providing a Fastly API key, and optionally the name of an S3 bucket:
 
-    python fastlydash.py cn23rn923rudj9u3r9dr23 --s3bucket beamly-dashboards
+    python fastlydash.py <FASTLY_API_KEY> --s3bucket beamly-dashboards
+
+Note that the resulting stored HTML file will be publically readable
