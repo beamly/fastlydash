@@ -30,4 +30,4 @@ And run providing an API key, and optionally the name of an S3 bucket:
 
     python fastlydash.py <API_KEY> --s3bucket beamly-dashboards
 
-Not that the resulting stored HTML file will be publically readable
+Note that the resulting stored HTML file will be publically readable
