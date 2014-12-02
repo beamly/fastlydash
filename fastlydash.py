@@ -156,7 +156,7 @@ def get_statistics(api_key, from_hours_ago=24):
     """
     Return a dictionary of configured services { 'name': 'id' }
     """
-    LOGGER.debug("In function get_all_services")
+    LOGGER.debug("In function get_statistics")
     endpoint = "stats?from={0}+hours+ago".format(from_hours_ago)
 
     LOGGER.info("Getting all service statistics for the last {0} hours")
