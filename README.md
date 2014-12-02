@@ -9,8 +9,8 @@ A simple python script that produces a summary of all Fastly services over the p
 - Number of requests
 - Percent of 20X, 30X, 40X, and 50X responses
 
-Features:
----------
+Features
+--------
 
 - Filter by service name
 - Clickable column headers to sort on an field
