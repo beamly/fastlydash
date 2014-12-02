@@ -15,6 +15,8 @@ Features:
 
 And optionally writes a pretty HTML page to S3.
 
+![Screenshot](docs/screenshot.png)
+
 Usage
 =====
 
