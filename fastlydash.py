@@ -1,4 +1,5 @@
 import argh
+import time
 import logging
 import requests
 from boto import s3
@@ -57,7 +58,7 @@ TEMPLATE = Template("""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
             position: absolute;
             right: 20px;
             top: 20px;
-            font-size: 16pt;
+            font-size: 12pt;
             padding: 5px;
         }
         .header{
@@ -69,9 +70,16 @@ TEMPLATE = Template("""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         table {
             width: 100%;
         }
-        h1{
+        h1,h3{
             margin: 0;
-            padding: 20px;
+            padding: 3px;
+        }
+        h1 {
+            font-size: 28pt;
+        }
+        h3 {
+            font-weight: normal;
+            font-size: 11pt;
         }
         #logo {
             float: left;
@@ -84,7 +92,8 @@ TEMPLATE = Template("""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         </style>
     </head>
     <body>
-    <div class="header"><div id="logo"></div><h1>Fastly service summary (Last 24 hours)</h1></div>
+    <div class="header"><div id="logo"></div><h1>Fastly service summary (Last 24 hours)</h1>
+    <h3>Generated {{ generated }}</h3></div></div>
     <input type="text" id="filter" placeholder="Service filter" />
    <table class="sortable-theme-finder" data-sortable>
     <thead>
@@ -216,7 +225,7 @@ def write_fastly_summary(**kwargs):
         else:
             LOGGER.info("No stats for service ID {0}".format(service))
 
-    rendered_template = TEMPLATE.render(services=service_data)
+    rendered_template = TEMPLATE.render(services=service_data, generated=time.strftime('%H:%M %Z on %A %d %b %Y'))
 
     if kwargs['s3bucket']:
         LOGGER.info("Writing s3://{0}/{1}".format(kwargs['s3bucket'], kwargs['filename']))
