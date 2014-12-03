@@ -194,14 +194,15 @@ def write_fastly_summary(**kwargs):
     service_data = []
 
     for service in services:
+        s = {'name': service, 'hit_ratio': '-', 'bandwidth': '-','data': '-', 'requests': '-', '20x': '-', '30x': '-', '40x': '-', '50x': '-'}
+
         if services[service] in stats['data']:
             if stats['data'][services[service]][0]['hit_ratio']:
                 hitrate = int(float(stats['data'][services[service]][0]['hit_ratio']) * 100)
             else:
                 hitrate = None
 
-            s = {}
-            s['name'] = service
+
             s['hit_ratio'] = hitrate
             s['bandwidth'] = stats['data'][services[service]][0]['bandwidth']
             s['data'] = sizeof_fmt(stats['data'][services[service]][0]['bandwidth'])
@@ -210,21 +211,24 @@ def write_fastly_summary(**kwargs):
             s['30x'] = int(100 * (stats['data'][services[service]][0]['status_3xx'] / float(stats['data'][services[service]][0]['requests'])))
             s['40x'] = int(100 * (stats['data'][services[service]][0]['status_4xx'] / float(stats['data'][services[service]][0]['requests'])))
             s['50x'] = int(100 * (stats['data'][services[service]][0]['status_5xx'] / float(stats['data'][services[service]][0]['requests'])))
-            service_data.append(s)
 
-            table.add_row([s['name'],
-                            s['hit_ratio'],
-                            s['bandwidth'],
-                            s['data'],
-                            s['requests'],
-                            s['20x'],
-                            s['30x'],
-                            s['40x'],
-                            s['50x']
-                            ])
+
         else:
-            table.add_row([service,'-','-','-','-','-','-','-','-'])
+
             LOGGER.info("No stats for service ID {0}".format(service))
+
+        table.add_row([s['name'],
+                        s['hit_ratio'],
+                        s['bandwidth'],
+                        s['data'],
+                        s['requests'],
+                        s['20x'],
+                        s['30x'],
+                        s['40x'],
+                        s['50x']
+                        ])
+
+        service_data.append(s)
 
     rendered_template = TEMPLATE.render(services=service_data, generated=time.strftime('%H:%M %Z on %A %d %b %Y'))
 
