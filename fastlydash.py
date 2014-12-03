@@ -168,7 +168,7 @@ def get_statistics(api_key, from_hours_ago=24):
     LOGGER.debug("In function get_statistics")
     endpoint = "stats?from={0}+hours+ago".format(from_hours_ago)
 
-    LOGGER.info("Getting all service statistics for the last {0} hours")
+    LOGGER.info("Getting all service statistics for the last {0} hours".format(from_hours_ago))
     resp = make_api_request(api_key, endpoint)
 
     LOGGER.debug("Exiting function get_statistics")
