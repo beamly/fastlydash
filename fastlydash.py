@@ -223,6 +223,7 @@ def write_fastly_summary(**kwargs):
                             s['50x']
                             ])
         else:
+            table.add_row([service,'-','-','-','-','-','-','-','-'])
             LOGGER.info("No stats for service ID {0}".format(service))
 
     rendered_template = TEMPLATE.render(services=service_data, generated=time.strftime('%H:%M %Z on %A %d %b %Y'))
