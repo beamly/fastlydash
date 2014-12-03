@@ -242,7 +242,7 @@ def write_fastly_summary(**kwargs):
 
         services_data.append(service_data)
 
-    rendered_template = TEMPLATE.render(services=service_data, generated=time.strftime('%H:%M %Z on %A %d %b %Y'))
+    rendered_template = TEMPLATE.render(services=services_data, generated=time.strftime('%H:%M %Z on %A %d %b %Y'))
 
     if kwargs['s3bucket']:
         LOGGER.info("Writing s3://{0}/{1}".format(kwargs['s3bucket'], kwargs['filename']))
