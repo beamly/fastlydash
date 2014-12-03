@@ -1,6 +1,5 @@
 argh
 boto
 jinja2
-logging
 requests
 prettytable
