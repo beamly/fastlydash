@@ -1,3 +1,9 @@
+"""
+fastlydash.py
+
+Generate an HTML summary of all services for a given Fastly account
+
+"""
 import argh
 import time
 import logging
@@ -141,7 +147,7 @@ def make_api_request(api_key, endpoint, fastly_root="https://api.fastly.com/"):
     """
     url = fastly_root + endpoint
     headers = {"Fastly-Key": api_key,
-                "Accept": "application/json"}
+               "Accept": "application/json"}
 
     LOGGER.info("Making {0} request to {1}".format("GET", endpoint))
     resp = requests.get(url, headers=headers)
@@ -175,7 +181,10 @@ def get_statistics(api_key, from_hours_ago=24):
     return resp.json()
 
 def sizeof_fmt(num, suffix='b'):
-    for unit in ['','K','M','G','T','P','E','Z']:
+    """
+    Format a number of bytes in to a humage readable size
+    """
+    for unit in ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z']:
         if abs(num) < 1024.0:
             return "%3.1f%s%s" % (num, unit, suffix)
         num /= 1024.0
@@ -186,16 +195,20 @@ def sizeof_fmt(num, suffix='b'):
 @argh.arg('--filename', default='fastly-stats.html', help='The name of the HTML file to write')
 @argh.arg('--s3acl', choices=('private', 'public-read', 'project-private', 'public-read-write', 'authenticated-read', 'bucket-owner-read', 'bucket-owner-full-control'), default='public-read', help='The canned ACL string to set on the object written to S3')
 def write_fastly_summary(**kwargs):
+    """
+    Output a summary of all fastly distributions on stdout, and optionally write
+    it as an HTML file to S3
+    """
 
     services = get_all_services(kwargs['fastly_api_key'])
     stats = get_statistics(kwargs['fastly_api_key'])
 
     table = PrettyTable(["Service", "Hit Ratio", "Bandwidth", "Data", "Requests", "% 20x", "% 30x", "% 40x", "% 50x"])
 
-    service_data = []
+    services_data = []
 
     for service in services:
-        s = {'name': service, 'hit_ratio': '-', 'bandwidth': '-','data': '-', 'requests': '-', '20x': '-', '30x': '-', '40x': '-', '50x': '-'}
+        service_data = {'name': service, 'hit_ratio': '-', 'bandwidth': '-', 'data': '-', 'requests': '-', '20x': '-', '30x': '-', '40x': '-', '50x': '-'}
 
         if services[service] in stats['data']:
             if stats['data'][services[service]][0]['hit_ratio']:
@@ -203,40 +216,38 @@ def write_fastly_summary(**kwargs):
             else:
                 hitrate = None
 
-
-            s['hit_ratio'] = hitrate
-            s['bandwidth'] = stats['data'][services[service]][0]['bandwidth']
-            s['data'] = sizeof_fmt(stats['data'][services[service]][0]['bandwidth'])
-            s['requests'] = stats['data'][services[service]][0]['requests']
-            s['20x'] = int(100 * (stats['data'][services[service]][0]['status_2xx'] / float(stats['data'][services[service]][0]['requests'])))
-            s['30x'] = int(100 * (stats['data'][services[service]][0]['status_3xx'] / float(stats['data'][services[service]][0]['requests'])))
-            s['40x'] = int(100 * (stats['data'][services[service]][0]['status_4xx'] / float(stats['data'][services[service]][0]['requests'])))
-            s['50x'] = int(100 * (stats['data'][services[service]][0]['status_5xx'] / float(stats['data'][services[service]][0]['requests'])))
-
+            service_data['hit_ratio'] = hitrate
+            service_data['bandwidth'] = stats['data'][services[service]][0]['bandwidth']
+            service_data['data'] = sizeof_fmt(stats['data'][services[service]][0]['bandwidth'])
+            service_data['requests'] = stats['data'][services[service]][0]['requests']
+            service_data['20x'] = int(100 * (stats['data'][services[service]][0]['status_2xx'] / float(stats['data'][services[service]][0]['requests'])))
+            service_data['30x'] = int(100 * (stats['data'][services[service]][0]['status_3xx'] / float(stats['data'][services[service]][0]['requests'])))
+            service_data['40x'] = int(100 * (stats['data'][services[service]][0]['status_4xx'] / float(stats['data'][services[service]][0]['requests'])))
+            service_data['50x'] = int(100 * (stats['data'][services[service]][0]['status_5xx'] / float(stats['data'][services[service]][0]['requests'])))
 
         else:
 
             LOGGER.info("No stats for service ID {0}".format(service))
 
-        table.add_row([s['name'],
-                        s['hit_ratio'],
-                        s['bandwidth'],
-                        s['data'],
-                        s['requests'],
-                        s['20x'],
-                        s['30x'],
-                        s['40x'],
-                        s['50x']
-                        ])
+        table.add_row([service_data['name'],
+                       service_data['hit_ratio'],
+                       service_data['bandwidth'],
+                       service_data['data'],
+                       service_data['requests'],
+                       service_data['20x'],
+                       service_data['30x'],
+                       service_data['40x'],
+                       service_data['50x']
+                      ])
 
-        service_data.append(s)
+        services_data.append(service_data)
 
     rendered_template = TEMPLATE.render(services=service_data, generated=time.strftime('%H:%M %Z on %A %d %b %Y'))
 
     if kwargs['s3bucket']:
         LOGGER.info("Writing s3://{0}/{1}".format(kwargs['s3bucket'], kwargs['filename']))
         conn = s3.connect_to_region('eu-west-1')
-        bucket=conn.get_bucket(kwargs['s3bucket'])
+        bucket = conn.get_bucket(kwargs['s3bucket'])
         k = Key(bucket)
         k.key = kwargs['filename']
         k.set_contents_from_string(rendered_template, policy=kwargs['s3acl'], headers={'Content-Type' : 'text/html'})
