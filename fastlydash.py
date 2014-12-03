@@ -184,6 +184,7 @@ def sizeof_fmt(num, suffix='b'):
 @argh.arg('fastly_api_key', help='The Fastly API key used to query Fastly')
 @argh.arg('--s3bucket', help='The name of the S3 bucket to write to')
 @argh.arg('--filename', default='fastly-stats.html', help='The name of the HTML file to write')
+@argh.arg('--s3acl', choices=('private', 'public-read', 'project-private', 'public-read-write', 'authenticated-read', 'bucket-owner-read', 'bucket-owner-full-control'), default='public-read', help='The canned ACL string to set on the object written to S3')
 def write_fastly_summary(**kwargs):
 
     services = get_all_services(kwargs['fastly_api_key'])
@@ -238,7 +239,7 @@ def write_fastly_summary(**kwargs):
         bucket=conn.get_bucket(kwargs['s3bucket'])
         k = Key(bucket)
         k.key = kwargs['filename']
-        k.set_contents_from_string(rendered_template, policy='public-read', headers={'Content-Type' : 'text/html'})
+        k.set_contents_from_string(rendered_template, policy=kwargs['s3acl'], headers={'Content-Type' : 'text/html'})
 
     print table.get_string(sortby="Hit Ratio")
     print "Showing {0} services".format(len(services))
