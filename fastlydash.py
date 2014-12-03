@@ -84,7 +84,7 @@ TEMPLATE = Template("""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         </style>
     </head>
     <body>
-    <div class="header"><div id="logo"></div><h1>Fastly distribution statistics (Last 24 hours)</h1></div>
+    <div class="header"><div id="logo"></div><h1>Fastly service summary (Last 24 hours)</h1></div>
     <input type="text" id="filter" placeholder="Service filter" />
    <table class="sortable-theme-finder" data-sortable>
     <thead>
@@ -220,7 +220,7 @@ def write_fastly_summary(**kwargs):
 
     if kwargs['s3bucket']:
         LOGGER.info("Writing s3://{0}/{1}".format(kwargs['s3bucket'], kwargs['filename']))
-        conn = s3.connect_to_region('us-east-1')
+        conn = s3.connect_to_region('eu-west-1')
         bucket=conn.get_bucket(kwargs['s3bucket'])
         k = Key(bucket)
         k.key = kwargs['filename']
